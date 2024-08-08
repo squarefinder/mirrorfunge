@@ -163,6 +163,7 @@ int main(int argc, char *argv[]) {
     std::ifstream source(fpath);
     if (!source.is_open()) {
         std::cerr << "That file does not exist\n";
+        return 0;
     }
 #endif
     InputWrapper in(INPUT_STREAM);
