@@ -20,14 +20,22 @@ Instruction     Action
 /               U <=> R, D <=> L
 \               U <=> L, D <=> R
 x               U <=> D, L <=> R
-^               R => U, L => U, U => D, D => 
-v               R => D, L => D, D => U, U =>
-<               U => L, D => L, L => R, R =>
->               U => R, D => R, R => L, L =>
+^               R => U, L => U, U => D, D => vertical splitter (see below)
+v               R => D, L => D, D => U, U => vertical splitter
+<               U => L, D => L, L => R, R => horizontal splitter
+>               U => R, D => R, R => L, L => horizontal splitter
 #               Skip over the next instruction (move the IP two spaces
                 this tick instead of one space)
 @               End the program
 ```
+
+## Splitters
+This happens when the IP encounters an arrow instruction from the pointy
+end. The splitters will pop `x` off the stack then change the
+direction of the IP to one of the directions based on the following:
+```
+vertical        if x is 0, R, otherwise L
+horizontal      if x is 0, D, otherwise U
 
 # IO
 ```
@@ -99,7 +107,7 @@ g               Pop x, then copy the xth element from the top of the stack
                 and push it to the top of the stack
 ```
 
-*Clarifications on `r`(etrieve), `s`(wap) and `g`(et) instructions*
+*Clarifications on `r`(etrieve), `s`(wap) and `g`(et) instructions:*
 
 The stack is 0-indexed from the top of the stack, and the index is taken
 after the initial value is popped. For example:
