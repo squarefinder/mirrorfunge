@@ -36,7 +36,7 @@ direction of the IP to one of the directions based on the following:
 ```
 vertical        if x is 0, R, otherwise L
 horizontal      if x is 0, D, otherwise U
-
+```
 # IO
 ```
 Instruction     Action
