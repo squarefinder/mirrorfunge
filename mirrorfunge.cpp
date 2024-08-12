@@ -237,7 +237,7 @@ int main(int argc, char *argv[]) {
                     ss << "[";
                     for (int i = 0; i < memstack.size(); ++i) {
                         ss << memstack[i];
-                        if (i >= memstack.size()-1) {
+                        if (i < memstack.size()-1) {
                             ss << ", ";
                         }
                     }
