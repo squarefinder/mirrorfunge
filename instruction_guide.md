@@ -1,10 +1,10 @@
 Sections:
- - [Control flow](#control-flow)
- - [IO](#io)
- - [String mode](#string-mode)
- - [Literals](#literals)
- - [Operations](#operations)
- - [Stack management](#stack-management)
+- [Control flow](#control-flow)
+- [IO](#io)
+- [String mode](#string-mode)
+- [Literals](#literals)
+- [Operations](#operations)
+- [Stack management](#stack-management)
 
 # Control flow
 In this section, U, D, L, R represent up, down, left and right
@@ -26,7 +26,6 @@ v               R => D, L => D, D => U, U => vertical splitter
 >               U => R, D => R, R => L, L => horizontal splitter
 #               Skip over the next instruction (move the IP two spaces
                 this tick instead of one space)
-@               End the program
 ```
 
 ## Splitters
@@ -122,4 +121,22 @@ Then the `r` instruction would be executed as follows:
 3 5 7 9 11              Pop 3
 3 7 9 11                Remove the element that is index 3 from the top
 3 7 9 11 5              Push that element
+```
+
+# Functions
+See [Custom Functions](README.md#custom-functions) for more details.
+```
+A-Z             Call the function bound to this name, or do nothing
+@               Return and pop the current stack frame if the FS is empty
+i               Pop k then n then x then y. Bind an inert function to
+                name n, which takes k arguments, and starts at position
+                (x, y) facing right
+j               Pop k then n then x then y. Bind a directional function
+                to name n, which takes k arguments, and starts at
+                position (x, y), preserving the current IP direction
+u               Pop n. If there is a function bound to n, unbind it.
+                Otherwise, do nothing.
+p               Pop x then y then z then w. Convert these to ascii, and
+                concatenate them to form a string 'xyzw'. Import the
+                module with this name
 ```
