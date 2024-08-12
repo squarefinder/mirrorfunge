@@ -72,6 +72,12 @@ Plan
     - The IP returns to its original state once the function has returned
     - The IP always starts the function facing right
 
+#### Custom Functions Implementation Progress
+- mirrorfunge.cpp
+    - Function Stack implemented
+- pyflect.py
+    - Nothing
+
 ## Instructions
 
 See the [instruction guide](instruction_guide.md).

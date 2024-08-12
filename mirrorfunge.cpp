@@ -45,13 +45,28 @@ stackval_t mtrand(stackval_t a, stackval_t b) {
     return (std::uniform_int_distribution<stackval_t>(a, b))(gen);
 }
 
+struct Frame {
+    Frame(int x, int y, Direction direction): x(x), y(y), direction(direction), memstack() {}
+    std::vector<stackval_t> memstack;
+    int x, y;
+    Direction direction;
+};
+
+struct FuncInfo {
+    FuncInfo(): bound(false) {}
+    bool bound;
+    int x, y;
+    int argc;
+};
+
 std::vector<std::string> src;
 int height, width;
 int x, y;
 Direction direction;
 int step;
 bool stringmode;
-std::vector<stackval_t> memstack;
+std::vector<Frame> funcstack;
+FuncInfo binds[26];
 
 Direction mapping_45[4]         = {UP, RIGHT, DOWN, LEFT},
           mapping_135[4]        = {DOWN, LEFT, UP, RIGHT},
@@ -64,13 +79,13 @@ char getInstruction() {
     return (width <= x) ? ' ' : src[y][x];
 }
 
-void verticalComp() {
+void verticalComp(std::vector<stackval_t> &memstack) {
     // For ^ and v
     direction = (memstack.back() == 0) ? RIGHT : LEFT;
     memstack.pop_back();
 }
 
-void horizontalComp() {
+void horizontalComp(std::vector<stackval_t> &memstack) {
     // For < and >
     direction = (memstack.back() == 0) ? DOWN : UP;
     memstack.pop_back();
@@ -178,7 +193,9 @@ int main(int argc, char *argv[]) {
     source.close();
 #endif
     if (height <= 0 || width <= 0) return 0;
-    while (1) {
+    funcstack.push_back(Frame{0, 0, RIGHT});
+    while (!funcstack.empty()) {
+        std::vector<stackval_t> &memstack = funcstack.back().memstack;
         char instruction = getInstruction();
         if (stringmode) {
             if (instruction == '"') {
@@ -199,25 +216,34 @@ int main(int argc, char *argv[]) {
                     break;
                 case '^':
                     direction = mapping_arrowup[direction];
-                    if (direction == SUPER) verticalComp();
+                    if (direction == SUPER) verticalComp(memstack);
                     break;
                 case 'v':
                     direction = mapping_arrowdown[direction];
-                    if (direction == SUPER) verticalComp();
+                    if (direction == SUPER) verticalComp(memstack);
                     break;
                 case '<':
                     direction = mapping_arrowleft[direction];
-                    if (direction == SUPER) horizontalComp();
+                    if (direction == SUPER) horizontalComp(memstack);
                     break;
                 case '>':
                     direction = mapping_arrowright[direction];
-                    if (direction == SUPER) horizontalComp();
+                    if (direction == SUPER) horizontalComp(memstack);
                     break;
                 case '#':
                     stepIP();
                     break;
                 case '@':
-                    goto end; // end
+                    if (funcstack.size() > 1) {
+                        for (stackval_t elem : memstack) {
+                            funcstack.end()[-2].memstack.push_back(elem);
+                        }
+                        Frame &currFrame = funcstack.back();
+                        x = currFrame.x;
+                        y = currFrame.y;
+                        direction = currFrame.direction;
+                    }
+                    funcstack.pop_back();
                     break;
                 case '&':
                     if (in.peekchar() == SENTINEL) {
@@ -361,6 +387,5 @@ int main(int argc, char *argv[]) {
         }
         stepIP();
     }
-end:
     return 0;
 }
