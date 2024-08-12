@@ -128,10 +128,10 @@ See [Custom Functions](README.md#custom-functions) for more details.
 ```
 A-Z             Call the function bound to this name, or do nothing
 @               Return and pop the current stack frame if the FS is empty
-i               Pop k then n then x then y. Bind an inert function to
+i               Pop k then n then y then x. Bind an inert function to
                 name n, which takes k arguments, and starts at position
                 (x, y) facing right
-j               Pop k then n then x then y. Bind a directional function
+j               Pop k then n then y then x. Bind a directional function
                 to name n, which takes k arguments, and starts at
                 position (x, y), preserving the current IP direction
 u               Pop n. If there is a function bound to n, unbind it.

@@ -75,6 +75,8 @@ Plan
 #### Custom Functions Implementation Progress
 - mirrorfunge.cpp
     - Function Stack implemented
+    - Inert binds implemented
+    - Function calling implemented
 - pyflect.py
     - Nothing
 

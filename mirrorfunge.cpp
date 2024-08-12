@@ -110,6 +110,13 @@ void stepIP() {
     y = (y%height + height)%height;
 }
 
+int getName(stackval_t n) {
+    if (n >=  0  && n <=  25) return n;
+    if (n >= 'A' && n <= 'Z') return n-'A';
+    if (n >= 'a' && n <= 'z') return n-'a';
+    return -1;
+}
+
 class InputWrapper {
 public:
     InputWrapper(std::istream &stream): stream(stream), inputbuf() {};
@@ -263,7 +270,7 @@ int main(int argc, char *argv[]) {
                     ss << "[";
                     for (int i = 0; i < memstack.size(); ++i) {
                         ss << memstack[i];
-                        if (i >= memstack.size()-1) {
+                        if (i < memstack.size()-1) {
                             ss << ", ";
                         }
                     }
@@ -275,6 +282,26 @@ int main(int argc, char *argv[]) {
                 memstack.push_back(instruction-'0');
             } else if ('a' <= instruction && instruction <= 'f') {
                 memstack.push_back(instruction-'a'+10);
+            } else if ('A' <= instruction && instruction <= 'Z') {
+                // Function call
+                int charname = getName(instruction);
+                if (binds[charname].bound) {
+                    funcstack.push_back(Frame{x, y, direction});
+                    std::vector<stackval_t> tmpmemstack, &oldmemstack = funcstack.end()[-2].memstack;
+                    for (int i = 0; i < binds[charname].argc; ++i) {
+                        if (oldmemstack.empty()) break;
+                        tmpmemstack.push_back(oldmemstack.back());
+                        oldmemstack.pop_back();
+                    }
+                    while (!tmpmemstack.empty()) {
+                        funcstack.back().memstack.push_back(tmpmemstack.back());
+                        tmpmemstack.pop_back();
+                    }
+                    x = binds[charname].x;
+                    y = binds[charname].y;
+                    direction = RIGHT;
+                }
+                continue;
             }
             if (memstack.size() >= 1) {
                 switch (instruction) { // 1-depth instructions
@@ -300,6 +327,15 @@ int main(int argc, char *argv[]) {
                         break;
                     case '$':
                         memstack.pop_back();
+                        break;
+                    case 'u':
+                        {
+                        int charname = getName(memstack.back());
+                        memstack.pop_back();
+                        if (charname >= 0) {
+                            binds[charname].bound = false;
+                        }
+                        }
                         break;
                 }
             }
@@ -353,6 +389,26 @@ int main(int argc, char *argv[]) {
                         stackval_t a = memstack.back();memstack.pop_back();
                         stackval_t b = memstack.back();memstack.pop_back();
                         memstack.push_back(mtrand(a, b));
+                        }
+                        break;
+                }
+            }
+            if (memstack.size() >= 4) { // 4-depth instructions
+                switch (instruction) {
+                    case 'i':
+                        {
+                        stackval_t k = memstack.back();memstack.pop_back();
+                        stackval_t n = memstack.back();memstack.pop_back();
+                        stackval_t starty = memstack.back();memstack.pop_back();
+                        stackval_t startx = memstack.back();memstack.pop_back();
+                        int charname = getName(n);
+                        if (charname >= 0) {
+                            FuncInfo &newbind = binds[charname];
+                            newbind.bound = true;
+                            newbind.x = startx;
+                            newbind.y = starty;
+                            newbind.argc = k;
+                        }
                         }
                         break;
                 }
