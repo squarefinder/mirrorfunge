@@ -2,6 +2,11 @@
 
 # A python interpreter of mirrorfunge
 
+VERSION_STRING = """
+mirrorfunge-2.1.1
+pyflect 2.1.1
+"""[1:]
+
 import sys, random, collections
 
 class Stack:
@@ -179,6 +184,9 @@ if __name__ == "__main__":
         fpath = sys.argv[1]
     else:
         print("Please provide a file", file=sys.stderr)
+        exit(0)
+    if fpath == "--version":
+        print(VERSION_STRING, end='')
         exit(0)
     try:
         with open(fpath) as source:

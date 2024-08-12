@@ -23,6 +23,11 @@ Write your program here (if EMBED is 1)
 )PROGRAM";
 #endif
 
+std::string VERSION_STRING = 1+R"VERSION(
+mirrorfunge-2.1.1
+mirrorfunge.cpp 1.0
+)VERSION";
+
 const int SENTINEL = -1;
 
 enum Direction : uint8_t {
@@ -158,6 +163,10 @@ int main(int argc, char *argv[]) {
         fpath = argv[1];
     } else {
         std::cerr << "Please provide a file\n";
+        return 0;
+    }
+    if (fpath == "--version") {
+        std::cout << VERSION_STRING;
         return 0;
     }
     std::ifstream source(fpath);
